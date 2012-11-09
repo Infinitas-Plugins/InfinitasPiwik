@@ -1,5 +1,18 @@
 <?php
+App::uses('PiwikApi', 'InfinitasPiwik.Lib/Piwik');
+/**
+ * @brief helper for general piwik related tasks
+ *
+ * @property PiwikApi $PiwikApi
+ */
+
 class PiwikHelper extends AppHelper {
+	public function __construct(View $View, $settings = array()) {
+		parent::__construct($View, $settings);
+
+		$this->PiwikApi = new PiwikApi();
+	}
+	
 /**
  * @brief image tracker when there is no js
  *
@@ -11,16 +24,12 @@ class PiwikHelper extends AppHelper {
  */
 	public function image($track = true) {
 		$queryParams = array(
-			'idsite' => $this->_siteId(),
 			'rec' => $track ? 1 : 0,
 			'action_name' => $this->_pageTitle(),
-			'referer' => $this->request->referer(),
-			'rand' => microtime(true),
-			'_id' => AuthComponent::user('id'),
-			'_idts' => AuthComponent::user('created')
+			'referer' => $this->request->referer()
 		);
 
-		return $this->Html->image($this->_url('piwik.php', $queryParams), array(
+		return $this->Html->image($this->PiwikApi->url('piwik.php', $queryParams, true), array(
 			'style' => 'border:0',
 			'alt' => 'Piwik tracker'
 		));
@@ -38,7 +47,7 @@ class PiwikHelper extends AppHelper {
 			'frameborder' => 'no',
 			'width' => '600px',
 			'height' => '200px',
-			'src' => $this->_url('index.php', array(
+			'src' => $this->PiwikApi->url('index.php', array(
 				'module' => 'CoreAdminHome',
 				'action' => 'optOut',
 				'language' => 'en'
@@ -56,88 +65,13 @@ class PiwikHelper extends AppHelper {
 	public function logo() {
 		return $this->Html->link(
 			$this->Html->image('InfinitasPiwik.icon.png'),
-			sprintf('http://%s/', $this->_site()),
+			$this->PiwikApi->trackingSite(),
 			array(
 				'style' => 'float: right;',
 				'escape' => false,
 				'target' => '_blank'
 			)
 		);
-	}
-
-/**
- * @brief generate a url to the piwik install
- *
- * @param string $path the path to run
- * @param array|string $queryParams the query parameters
- *
- * @return string
- *
- * @throws CakeException
- */
-	protected function _url($path, $queryParams = null) {
-		if(is_array($queryParams)) {
-			$queryParams = http_build_query($queryParams);
-		}
-
-		$url = ':scheme://:host/:path?:query';
-		if(!$queryParams) {
-			$url = ':scheme://:host/:path';
-		}
-		return String::insert($url, array(
-			'scheme' => 'http',
-			'host' => $this->_site(),
-			'path' => $path,
-			'query' => (string)$queryParams
-		));
-	}
-
-/**
- * @brief get the piwik tracking site
- *
- * @return string
- *
- * @throws CakeException
- */
-	protected function _site() {
-		$site = Configure::read('InfinitasPiwik.piwik');
-		if(!$site) {
-			throw new CakeException('Piwik not configured');
-		}
-
-		return $site;
-	}
-
-/**
- * @brief get the site id being tracked
- *
- * @return integer
- *
- * @throws CakeException
- */
-	protected function _siteId() {
-		$siteId = Configure::read('InfinitasPiwik.site_id');
-		if(!$siteId) {
-			throw new CakeException('Piwik not configured');
-		}
-
-		return $siteId;
-	}
-
-/**
- * @brief get the token for api calls
- *
- * @return string
- *
- * @throws CakeException
- */
-	protected function _token() {
-		$token = Configure::read('InfinitasPiwik.report.auth_token');
-		if(!$token) {
-			throw new CakeException('Piwik auth token not configured');
-		}
-
-		return $token;
 	}
 
 /**
