@@ -13,6 +13,10 @@ class InfinitasPiwikController extends InfinitasPiwikAppController {
  * @throws CakeException
  */
 	public function tracker() {
+		if($this->request->params['admin'] && !Configure::read('InfinitasPiwik.track_admin')) {
+			throw new CakeException('Admin tracking disabled');
+		}
+		
 		$this->Piwik->trackerHeaders();
 		$siteId = Configure::read('InfinitasPiwik.site_id');
 		$site = Configure::read('InfinitasPiwik.piwik');

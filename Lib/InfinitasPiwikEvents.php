@@ -81,11 +81,18 @@ class InfinitasPiwikEvents extends AppEvents {
 /**
  * @brief load up the tracking scripts
  *
+ * Tracking scripts are only loaded for admin when the `track_admin` config has
+ * been set to true.
+ *
  * @param Event $Event the event being loaded
  *
  * @return array
  */
 	public function onRequireJavascriptToLoad(Event $Event) {
+		if($Event->Handler->request->params['admin'] && !Configure::read('InfinitasPiwik.track_admin')) {
+			return array();
+		}
+
 		return array(
 			'/infinitas_piwik/infinitas_piwik/tracker.js',
 			'InfinitasPiwik.piwik'
