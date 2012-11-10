@@ -16,6 +16,10 @@ This is the id of your site **in Piwik**. An invalid site id specified here may 
 
 This is the time that will be sent as the cache header. The default is `1 week` when debug is disabled. If debug is enabled the cache will be set to `-1 day`, in other words already expired.
 
+##### track\_admin
+
+By default this option is set to false and will not track admin usage. Setting to true will allow admin tracking.
+
 #### Reporting
 
 ##### report.site\_id
