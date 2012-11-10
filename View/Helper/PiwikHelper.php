@@ -7,12 +7,70 @@ App::uses('PiwikApi', 'InfinitasPiwik.Lib/Piwik');
  */
 
 class PiwikHelper extends AppHelper {
+	public $helpers = array(
+		'Events.Event',
+		'Html'
+	);
+
+/**
+ * @brief Constructor
+ *
+ * Load the piwik api class
+ *
+ * @param View $View The view being rendered
+ * @param type $settings settings for the helper
+ *
+ * @return void
+ */
 	public function __construct(View $View, $settings = array()) {
 		parent::__construct($View, $settings);
 
 		$this->PiwikApi = new PiwikApi();
 	}
-	
+
+/**
+ * @brief get custom variables that should be tracked
+ *
+ * This method triggers an event for other plugins to include custom tracking variables.
+ *
+ * @return array
+ */
+	public function customVariables() {
+		$trackingVariables = current($this->Event->trigger('trackingVariables'));
+
+		$visit = $page = array();
+		foreach($trackingVariables as $plugin => $variables) {
+			if(empty($variables)) {
+				continue;
+			}
+			foreach($variables as $variable) {
+				$variable = array_merge(array(
+					'name' => null,
+					'value' => null,
+					'scope' => null
+				), $variable);
+
+				$skip = count(array_filter($variable)) < 3 ||
+					!in_array($variable['scope'], array('visit', 'page'));
+				if(!$skip) {
+					$count = count(${$variable['scope']});
+					$skip = $count >= 5;
+				}
+				if($skip) {
+					continue;
+				}
+
+				${$variable['scope']}[$count] = $variable;
+				${$variable['scope']}[$count]['id'] = $count + 1;
+			}
+		}
+
+		return array(
+			'visit' => $visit,
+			'page' => $page
+		);
+	}
+
 /**
  * @brief image tracker when there is no js
  *

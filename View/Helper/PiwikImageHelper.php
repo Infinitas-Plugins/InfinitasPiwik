@@ -20,6 +20,17 @@ class PiwikImageHelper extends PiwikHelper {
 		}
 	}
 
+/**
+ * @brief render the markup for displaying user tracking reports
+ *
+ * If the chart is passed as a string it will be loaded as a presset using __call(),
+ * and if passed as an array will use the PiwikImageHelper::draw() method.
+ *
+ * @param string|array $chart
+ * @param array $options
+ *
+ * @return string
+ */
 	public function draw($chart, array $options = array()) {
 		$options = array_merge(array(
 			'title' => __d('infinitas_piwik', 'Chart'),

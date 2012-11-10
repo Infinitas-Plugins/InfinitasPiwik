@@ -99,4 +99,33 @@ class InfinitasPiwikEvents extends AppEvents {
 		);
 	}
 
+/**
+ * @brief get tracking variables
+ *
+ * @param Event $event the event being triggered
+ *
+ * @return array
+ */
+	public function onTrackingVariables(Event $Event) {
+		$return = array();
+
+		if(AuthComponent::user('id')) {
+			$return[] = array(
+				'name' => 'userId',
+				'value' => AuthComponent::user('id'),
+				'scope' => 'visit'
+			);
+		}
+
+		if($Event->Handler->request->params['admin']) {
+			$return[] = array(
+				'name' => 'admin',
+				'value' => 1,
+				'scope' => 'page'
+			);
+		}
+
+		return $return;
+	}
+
 }

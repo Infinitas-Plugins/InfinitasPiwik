@@ -1,6 +1,13 @@
+<?php
+	list($visit, $page) = array_values($this->Piwik->customVariables());
+?>
 var trackingSite = '<?php echo $infinitasPiwik['site']; ?>',
 	trackingId = <?php echo $infinitasPiwik['site_id']; ?>,
-	protocol = 'http';
+	protocol = 'http',
+	customVariables = {
+		page: <?php echo json_encode($page); ?>,
+		visit: <?php echo json_encode($visit); ?>
+	};
 
 if(document.location.protocol == "https:") {
 	protocol = 'https';
