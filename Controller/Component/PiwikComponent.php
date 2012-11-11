@@ -5,7 +5,7 @@ class PiwikComponent extends InfinitasComponent {
  */
 	public function trackerHeaders() {
 		$this->Controller->response->type('js');
-		$this->Controller->response->cache('-1 minute', Configure::read('InfinitasPiwik.tracker_cache'));
+		//$this->Controller->response->cache('-1 minute', Configure::read('InfinitasPiwik.tracker_cache'));
 	}
 
 }
