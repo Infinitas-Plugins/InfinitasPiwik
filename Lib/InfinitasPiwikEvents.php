@@ -28,7 +28,8 @@ class InfinitasPiwikEvents extends AppEvents {
  */
 	public function onAdminMenu(Event $Event) {
 		$menu['main'] = array(
-			'Dashboard' => array('plugin' => 'infinitas_piwik', 'controller' => 'infinitas_piwik', 'action' => 'dashboard')
+			'Dashboard' => array('plugin' => 'infinitas_piwik', 'controller' => 'infinitas_piwik', 'action' => 'dashboard'),
+			'Setup' => array('plugin' => 'infinitas_piwik', 'controller' => 'infinitas_piwik', 'action' => 'setup'),
 		);
 
 		return $menu;

@@ -133,6 +133,13 @@ class PiwikApi {
 	);
 
 /**
+ * @brief the default API data format for requests
+ *
+ * @var string
+ */
+	protected $_defaultFormat = 'JSON';
+
+/**
  * @brief overload the url method
  *
  * All images use index.php, the first argument can be queryParams and the default
@@ -189,7 +196,7 @@ class PiwikApi {
 		return 'http';
 	}
 
-	/**
+/**
  * @brief Set up the default query params
  *
  * @param View $View The view being rendered
@@ -209,7 +216,7 @@ class PiwikApi {
 			'graphType' => 'line',
 			'column' => 'visits',
 			'period' => 'day',
-			'date' => 'previous30',
+			'date' => 'last30',
 			'width' => 500,
 			'height' => 250
 		);
@@ -232,11 +239,67 @@ class PiwikApi {
 		);
 	}
 
+/**
+ * @brief default query params for api requests
+ *
+ * @return array
+ */
+	public function defaultApiRequestQuery() {
+		return array(
+			'module' => 'API',
+			'method' => null,
+			'apiModule' => null,
+			'apiAction' => null,
+			'idSite' => self::_siteId(),
+			'token_auth' => self::_token()
+		);
+	}
+
+/**
+ * @brief check the tracking params
+ *
+ * @param array|string $queryParams the query params
+ *
+ * @return string
+ */
 	public function trackingParams($queryParams) {
 		if(is_string($queryParams) || empty($queryParams)) {
 			return $queryParams;
 		}
+
 		return http_build_query(array_merge(self::defaultTrackingQuery(), $queryParams));
+	}
+
+/**
+ * @brief check the request api params
+ *
+ * @param string|array $queryParams the queryparams
+ *
+ * @return string
+ *
+ * @throws InvalidArgumentException
+ */
+	public function apiRequestParams($queryParams) {
+		if(is_string($queryParams) || empty($queryParams)) {
+			return $queryParams;
+		}
+
+		$queryParams = array_merge(self::defaultApiRequestQuery(), $queryParams);
+
+		if(empty($queryParams['method']) && (empty($queryParams['apiModule']) || empty($queryParams['apiAction']))) {
+			throw new InvalidArgumentException(__d('infinitas_piwik', 'No api method selected'));
+		}
+
+		if(empty($queryParams['method'])) {
+			$queryParams['method'] = implode('.', array($queryParams['apiModule'], $queryParams['apiAction']));
+		}
+		unset($queryParams['apiModule'], $queryParams['apiAction']);
+
+		if(empty($queryParams['format'])) {
+			$queryParams['format'] = $this->_defaultFormat;
+		}
+
+		return $queryParams;
 	}
 
 /**
@@ -251,6 +314,14 @@ class PiwikApi {
 	public function apiParams($queryParams) {
 		if(is_string($queryParams) || empty($queryParams)) {
 			return $queryParams;
+		}
+
+		if(array_key_exists('api', $queryParams)) {
+			$api = $queryParams['api'];
+			unset($queryParams['api']);
+			if($api) {
+				return http_build_query(self::apiRequestParams($queryParams));
+			}
 		}
 
 		$queryParams = array_merge(self::defaultApiQuery(), $queryParams);
