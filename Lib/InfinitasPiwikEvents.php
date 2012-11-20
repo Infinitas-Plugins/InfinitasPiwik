@@ -5,7 +5,7 @@ class InfinitasPiwikEvents extends AppEvents {
  *
  * @return array
  */
-	public function onPluginRollCall() {
+	public function onPluginRollCall(Event $Event) {
 		return array(
 			'name' => 'Piwik',
 			'description' => 'Piwik visitor tracker',
