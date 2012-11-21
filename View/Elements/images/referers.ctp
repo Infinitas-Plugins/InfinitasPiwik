@@ -2,7 +2,7 @@
 echo $this->PiwikImage->draw('refererTypes', array(
 	'title' => __d('infinitas_piwik', 'Referer types'),
 	'div' => array(
-		'class' => 'dashboard half'
+		'class' => 'dashboard span6'
 	)
 ));
 echo $this->PiwikImage->draw('refererCampaigns', array(
