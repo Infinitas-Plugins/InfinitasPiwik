@@ -94,9 +94,10 @@ class InfinitasPiwikEvents extends AppEvents {
 			return array();
 		}
 
+		$key = md5(env('SERVER_NAME'));
 		return array(
-			'/infinitas_piwik/infinitas_piwik/tracker.js?_infinitas=' . md5(env('SERVER_NAME')),
-			'InfinitasPiwik.piwik'
+			'/infinitas_piwik/infinitas_piwik/tracker.js?_infinitas=' . $key,
+			'InfinitasPiwik.piwik.js?_infinitas=' . $key
 		);
 	}
 
